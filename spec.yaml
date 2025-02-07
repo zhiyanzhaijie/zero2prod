@@ -1,5 +1,6 @@
 name: zero2prod
 
+region: fra
 services:
   - name: zero2prod
     dockerfile_path: Dockerfile
