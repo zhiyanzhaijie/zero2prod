@@ -12,7 +12,8 @@ async fn main() -> std::io::Result<()> {
     init_subscriber(subscriber);
 
     let configuration = get_configurer().expect("Failed load configuration");
-    let connection_pool = PgPoolOptions::new().connect_lazy_with(configuration.database.with_db());
+    let connection_pool =
+        PgPoolOptions::new().connect_lazy_with(configuration.database.connect_options());
 
     let address = format!(
         "{}:{}",

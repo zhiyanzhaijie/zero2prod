@@ -16,7 +16,7 @@ pub struct ApplicationSettings {
     pub host: String,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Deserialize, Clone)]
 pub struct DatabaseSettings {
     pub username: String,
     pub password: Secret<String>,
@@ -28,24 +28,19 @@ pub struct DatabaseSettings {
 }
 
 impl DatabaseSettings {
-    pub fn with_db(&self) -> PgConnectOptions {
-        let mut option = self.without_db().database(&self.database_name);
-        option
-    }
-
-    pub fn without_db(&self) -> PgConnectOptions {
-        let is_ssl = if self.require_ssl {
+    pub fn connect_options(&self) -> PgConnectOptions {
+        let ssl_mode = if self.require_ssl {
             PgSslMode::Require
         } else {
             PgSslMode::Prefer
         };
-
         PgConnectOptions::new()
             .host(&self.host)
             .username(&self.username)
-            .password(&self.password.expose_secret())
+            .password(self.password.expose_secret())
             .port(self.port)
-            .ssl_mode(is_ssl)
+            .ssl_mode(ssl_mode)
+            .database(&self.database_name)
     }
 }
 
